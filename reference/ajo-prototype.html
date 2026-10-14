@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ajo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1EE;--card:#F8FAF8;--ink:#0F2A24;--mute:#4E625B;--line:#C9D2CC;--btn:#0B6B4F;--btn-ink:#fff;--saf:#F2B705;--coral:#B53A18;--ring-bg:#D3DBD6;
+--ui:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;--num:"Fraunces",Georgia,serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C1613;--card:#13211C;--ink:#E6EEE9;--mute:#9BB0A6;--line:#26382F;--btn:#4CC39A;--btn-ink:#08150F;--coral:#FF8A68;--ring-bg:#26382F}}
+:root[data-theme="dark"]{--bg:#0C1613;--card:#13211C;--ink:#E6EEE9;--mute:#9BB0A6;--line:#26382F;--btn:#4CC39A;--btn-ink:#08150F;--coral:#FF8A68;--ring-bg:#26382F}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.4}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--btn);outline-offset:3px}
+.app{max-width:430px;margin:0 auto;padding:20px 20px 112px;display:flex;flex-direction:column;gap:24px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.mute{color:var(--mute);font-size:14px}
+h1,h2{margin:0}
+h1{font-size:24px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:17px;font-weight:700}
+.avatar{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;font-weight:700}
+.hero{position:relative;overflow:hidden;color:#E6EEE9;background:#0F2A24;padding:20px;min-height:224px;display:flex;flex-direction:column;gap:6px;touch-action:pan-y}
+.hero svg.g{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero>*:not(.g){position:relative}
+.tag{background:var(--saf);color:#0F2A24;font-size:12px;font-weight:700;padding:4px 10px}
+.bal{font-family:var(--num);font-size:46px;font-weight:500;letter-spacing:-.02em;line-height:1.05;font-variant-numeric:tabular-nums}
+.spark{width:100%;height:48px}
+.spark path{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s .3s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.btn{min-height:44px;padding:0 18px;border:0;background:var(--btn);color:var(--btn-ink);font-weight:700}
+.btn[disabled]{opacity:.6;cursor:default}
+.b2{min-height:44px;padding:0 18px;border:1px solid currentColor;background:transparent;font-weight:600}
+.hero .btn{background:var(--saf);color:#0F2A24}
+.hero .b2{color:#E6EEE9}
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qa button{min-height:68px;border:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600}
+.qa svg{width:22px;height:22px;stroke:var(--btn);fill:none;stroke-width:2}
+.card{border:1px solid var(--line);background:var(--card);padding:16px}
+.circle{display:flex;gap:16px;align-items:center}
+.circle svg{flex:0 0 140px;width:140px;height:140px}
+.circle .t{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.arc{transition:stroke-dashoffset 1.1s .2s cubic-bezier(.2,.7,.2,1)}
+.ctr{font-family:var(--num);font-size:21px;fill:var(--ink)}
+.scroll{display:flex;gap:12px;overflow-x:auto;margin:10px -20px 0;padding:0 20px 4px;scroll-snap-type:x mandatory}
+.goal{flex:0 0 152px;scroll-snap-align:start;border:1px solid var(--line);background:var(--card);padding:16px;display:flex;flex-direction:column;gap:6px}
+.goal svg{width:64px;height:64px}
+.streak{display:flex;gap:6px;margin-top:8px}
+.streak i{width:12px;height:12px;border-radius:50%;background:var(--btn)}
+.streak i.o{background:transparent;border:2px solid var(--line)}
+.act{list-style:none;margin:10px 0 0;padding:0}
+.act li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.out{color:var(--coral)}
+.tabs{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(430px,100%);display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{flex:1;min-height:60px;border:0;background:transparent;color:var(--mute);font-size:12px;font-weight:600}
+.tabs button[aria-current="page"]{color:var(--btn);font-weight:700}
+.soon{padding:48px 0;text-align:center}
+.toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.on{opacity:1}
+.v{display:flex;flex-direction:column;gap:20px}
+.bar{height:8px;background:var(--ring-bg)}.bar i{display:block;height:8px;width:0;background:var(--saf);transition:width .6s}
+.big2{font-family:var(--num);font-size:38px;font-variant-numeric:tabular-nums;line-height:1.1}
+.chip{min-height:44px;padding:0 12px;border:1px solid currentColor;background:transparent;font-size:13px;font-weight:600}
+.st{font-size:12px;font-weight:700;padding:4px 8px;border:1px solid var(--ink);white-space:nowrap}
+.st.ok{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}.st.due{background:var(--saf);color:#0F2A24;border-color:var(--saf)}.st.late{background:var(--coral);color:var(--bg);border-color:var(--coral)}
+.thread{display:flex;flex-direction:column;gap:10px}
+.m{max-width:80%;padding:10px 12px;border:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;gap:2px;align-self:flex-start}
+.m.me{align-self:flex-end;background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.sys{align-self:center;width:92%;border:1px dashed var(--mute);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.comp{position:sticky;bottom:calc(60px + env(safe-area-inset-bottom,0px));background:var(--bg);padding:10px 0;display:flex;gap:8px}
+.comp input{flex:1;min-width:0;min-height:44px;border:1px solid var(--ink);background:var(--card);color:var(--ink);padding:0 12px;font:inherit}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pad button{min-height:60px;border:1px solid var(--ink);background:transparent;font-size:22px}
+.dots{display:flex;justify-content:center;gap:16px}.dots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink)}.dots i.f{background:var(--ink)}
+.ctr2{text-align:center}.err{color:var(--coral);font-weight:600;text-align:center}
+.flow .tabs{display:none}
+.fld select{min-height:48px;border:1px solid var(--ink);background:var(--card);color:var(--ink);padding:0 12px;font:inherit}
+.fld textarea{border:1px solid var(--ink);background:var(--card);color:var(--ink);padding:10px 12px;font:inherit;resize:vertical}
+.card a{color:var(--btn);font-weight:600}
+.faq{border-top:1px solid var(--line)}.faq:last-child{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;min-height:52px;display:flex;align-items:center;font-weight:600;list-style:none}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";margin-left:auto;color:var(--mute)}.faq[open] summary::after{content:"−"}
+.badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--saf);color:#0F2A24;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.badge[hidden]{display:none}
+.sw{position:relative;flex:0 0 52px;width:52px;height:44px;border:0;background:transparent;padding:0}
+.sw::before{content:"";position:absolute;left:0;top:10px;width:52px;height:24px;border-radius:12px;background:var(--ring-bg);border:1px solid var(--line)}
+.sw[aria-checked="true"]::before{background:var(--btn);border-color:var(--btn)}
+.sw i{position:absolute;top:13px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--card);box-shadow:0 0 0 1px var(--mute);transition:transform .2s}
+.sw[aria-checked="true"] i{transform:translateX(28px);background:var(--btn-ink)}
+@media (prefers-reduced-motion:reduce){.sw i{transition:none}}
+.fix{display:grid;place-items:center;min-height:48px;padding:0 12px;border:1px solid var(--ink);background:var(--card);font-weight:700}
+.swell{transform-box:fill-box;transform-origin:center;animation:swell 1.2s ease-in-out infinite alternate}
+@keyframes swell{to{transform:scale(1.3)}}
+.bw{position:relative;align-self:center;width:110px;height:110px}
+.bw i{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--saf);animation:burst .9s ease-out forwards}
+@keyframes burst{from{transform:rotate(var(--a)) translateY(0)}to{transform:rotate(var(--a)) translateY(-90px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.swell{animation:none}.bw i{display:none}}
+.li{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gbtn{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;cursor:pointer}
+.fld{display:flex;flex-direction:column;gap:6px}.fld input{min-height:48px;border:1px solid var(--ink);background:var(--card);color:var(--ink);padding:0 12px;font:inherit}
+.chk circle,.chk path{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .9s ease-out forwards}
+@media (prefers-reduced-motion:reduce){.chk circle,.chk path{animation:none;stroke-dashoffset:0}.bar i{transition:none}.spark path{animation:none;stroke-dashoffset:0}.arc{transition:none}}
+</style>
+</head>
+<body>
+<main class="app">
+<section id="home" class="app" style="padding:0;gap:24px">
+  <div class="row"><div><div class="mute" id="greet">Good morning</div><h1>Your savings</h1></div><div style="display:flex;gap:8px"><button class="avatar" id="bell" data-go="notifs" aria-label="Notifications" style="position:relative"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 17v-6a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></svg><span id="bellN" class="badge" hidden></span></button><button class="avatar" id="avatar" data-go="profile" aria-label="Open profile">A</button></div></div>
+
+  <div class="hero" id="hero">
+    <svg class="g" id="rose" viewBox="0 0 390 224" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+    <div class="row"><span style="font-size:14px;opacity:.85">Total balance</span><span class="tag">+₦12,400 this month</span></div>
+    <div class="bal" id="bal" aria-live="polite">₦0.00</div>
+    <svg class="spark" viewBox="0 0 320 48" preserveAspectRatio="none" aria-label="Balance over the last six months"><path pathLength="1" fill="none" stroke="#F2B705" stroke-width="2" d="M0 40 L55 36 L110 38 L165 26 L220 20 L275 12 L320 6"/></svg>
+    <div class="row" style="justify-content:flex-start;margin-top:auto"><button class="btn" id="add">Add ₦10,000</button><button class="b2" data-go="send">Send</button></div>
+  </div>
+
+  <div class="qa">
+    <button data-go="save"><svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></svg>Save</button>
+    <button data-go="send"><svg viewBox="0 0 24 24"><path d="M5 19L19 5M9 5h10v10"/></svg>Send</button>
+    <button data-go="join"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="4" r="1.5"/></svg>Join circle</button>
+    <button data-go="request"><svg viewBox="0 0 24 24"><path d="M19 5L5 19M15 19H5V9"/></svg>Request</button>
+  </div>
+
+  <div>
+    <div class="row"><h2>Your circle</h2><button class="chip" data-go="circle">Open Office Ajo</button></div>
+    <div class="card circle" style="margin-top:10px">
+      <svg id="ring" viewBox="0 0 160 160" role="img" aria-label="Eight members, round 3 of 8"></svg>
+      <div class="t"><h2>Chika collects in 3 days</h2><div class="mute">Your turn comes in round 4</div><div class="mute" id="paidTxt">5 of 8 paid this round</div><button class="btn" id="pay">Pay ₦25,000</button></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="row"><h2>Goals</h2><span class="mute">See all</span></div>
+    <div class="scroll" id="goals"></div>
+  </div>
+
+  <div id="joined" style="display:flex;flex-direction:column;gap:12px"></div>
+
+  <div class="card"><div class="row"><div><h2>6-week saving streak</h2><div class="mute">Save before Friday to keep it going</div></div></div>
+    <div class="streak" aria-label="6 of 8 weeks"><i></i><i></i><i></i><i></i><i></i><i></i><i class="o"></i><i class="o"></i></div></div>
+
+  <div><div class="row"><h2>Recent activity</h2><button class="chip" data-go="activity">See all</button></div><ul class="act" id="act"></ul></div>
+</section>
+
+<section id="other" class="soon" hidden><h1 id="otherT"></h1><p class="mute">This screen is next on the build list.</p></section>
+
+<section id="circle" class="v" hidden>
+  <div class="row"><div style="display:flex;align-items:center;gap:10px"><button class="chip" data-go="circles">Back</button><h1>Office Ajo</h1></div><button class="b2" data-go="thread">Chat</button></div>
+  <div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="row"><span class="mute">Pot this round</span><span class="mute">8 members</span></div><div class="big2">₦200,000</div><div class="mute">₦25,000 each, every Friday</div><div class="bar"><i id="cbar"></i></div><div class="mute" id="cpaid"></div></div>
+  <div class="card" style="border-color:var(--saf)"><h2>Chika collects in 3 days</h2><div class="mute">Friday · your turn is round 4</div></div>
+  <div><h2>Payout order</h2><ul class="act" id="mlist"></ul></div>
+  <button class="btn" id="pay2">Pay ₦25,000</button>
+</section>
+
+<section id="thread" class="v" hidden>
+  <div class="row"><h1>Office Ajo chat</h1><button class="b2" data-go="circle">Details</button></div>
+  <div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="row"><span id="tstat"></span><span class="mute">Round 3 of 8</span></div><div class="bar"><i id="tbar"></i></div></div>
+  <div class="thread" id="msgs" aria-live="polite"></div>
+  <form class="comp" id="comp"><button type="button" class="chip" id="pay3">Pay ₦25,000</button><input id="mi" aria-label="Message" placeholder="Message" autocomplete="off"><button class="btn">Send</button></form>
+</section>
+
+<section id="send" class="v" hidden>
+  <div class="row"><button class="b2" id="sback">Back</button><h2 id="stitle">Send money</h2><span style="width:72px"></span></div>
+  <div class="v" id="sbody"></div>
+</section>
+
+<section id="bank" class="v" hidden>
+  <div class="row"><button class="chip" id="bankBack">Back</button><h1 id="bankT">Bank accounts</h1><span style="width:72px"></span></div>
+  <div class="v" id="bankbody"></div>
+</section>
+
+<section id="help" class="v" hidden>
+  <div class="row"><button class="chip" id="helpBack">Back</button><h1>Help and support</h1><span style="width:72px"></span></div>
+  <div class="v" id="helpbody"></div>
+</section>
+
+<section id="notifs" class="v" hidden>
+  <div class="row"><button class="chip" data-go="home">Back</button><h1>Notifications</h1><button class="chip" id="nfall">Mark all read</button></div>
+  <div id="nflist"></div>
+</section>
+
+<section id="profile" class="v" hidden>
+  <div class="row"><button class="chip" id="profBack">Back</button><h1 id="profT">Profile</h1><span style="width:72px"></span></div>
+  <div class="v" id="profbody"></div>
+</section>
+
+<section id="onboard" class="v" hidden>
+  <div class="row" style="justify-content:flex-end;gap:8px"><button class="chip" id="obBack" hidden>Back</button><button class="chip" id="obSkip">Skip intro</button></div>
+  <div class="v" id="obbody"></div>
+</section>
+
+<section id="payout" class="v" hidden>
+  <div class="row"><button class="b2" id="pyClose">Close</button><span class="mute" id="pyRound"></span></div>
+  <div class="v" id="pybody"></div>
+</section>
+
+<section id="start" class="v" hidden>
+  <div class="row"><h1>Start a circle</h1><button class="b2" id="startBack">Back</button></div>
+  <div class="v" id="startbody"></div>
+</section>
+
+<section id="circles" class="v" hidden>
+  <div class="row"><h1>Circles</h1><button class="b2" data-go="join">Join with code</button></div>
+  <div class="v" id="clist"></div>
+  <button class="b2" data-go="start">+ Start a circle</button>
+</section>
+
+<section id="cwait" class="v" hidden>
+  <div class="row"><button class="chip" data-go="circles">Back</button><span class="st due" id="wst"></span></div>
+  <h1 id="wname"></h1>
+  <div class="v" id="wbody"></div>
+</section>
+
+<section id="join" class="v" hidden>
+  <div class="row"><h1 id="joinT">Join a circle</h1><button class="b2" id="joinBack" hidden>Back</button></div>
+  <div class="v" id="joinbody"></div>
+</section>
+
+<section id="request" class="v" hidden>
+  <div class="row"><h1 id="reqT">Request money</h1><button class="b2" id="reqBack" hidden>Back</button></div>
+  <div class="v" id="reqbody"></div>
+</section>
+
+<section id="activity" class="v" hidden>
+  <h1>Activity</h1>
+  <div class="fld"><input id="aq" type="search" aria-label="Search transactions" placeholder="Search transactions" autocomplete="off"></div>
+  <div class="chips" id="achips" role="group" aria-label="Filter transactions"></div>
+  <div class="row mute" id="asum" aria-live="polite"></div>
+  <div id="alist"></div>
+</section>
+
+<section id="save" class="v" hidden>
+  <div class="row"><h1 id="saveT">Goals</h1><button class="b2" id="saveBack" hidden>Back</button></div>
+  <div class="v" id="savebody"></div>
+</section>
+</main>
+
+<nav class="tabs" aria-label="Main">
+  <button aria-current="page" data-tab="Home">Home</button><button data-tab="Goals">Goals</button><button data-tab="Circles">Circles</button><button data-tab="Chats">Chats</button><button data-tab="Activity">Activity</button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ---- Mock provider: the only place money logic lives. Swap this object for a real service later. ---- */
+const provider=(()=>{
+  const goals=[{n:"New laptop",s:180000,g:450000},{n:"Rent",s:320000,g:600000},{n:"Emergency fund",s:110000,g:500000}];
+  const circles={"AJO-3580":{name:"Weekend Savers",amt:10000,every:"week",size:6,joinedN:4,by:"Kemi"},"AJO-7305":{name:"Family Esusu",amt:50000,every:"month",size:10,joinedN:7,by:"Mum"}},joined=[],reqs=[],banks=[];
+  const D=(o,h)=>{const d=new Date();d.setHours(h,0,0,0);d.setDate(d.getDate()-o);return +d};
+  const db={balance:248500,paid:5,activity:[
+    {t:"Office Ajo contribution",a:-25000,at:Date.now()-2*36e5},{t:"Added from bank",a:60000,at:Date.now()-5*36e5},{t:"Transfer to Amaka Obi",a:-15000,at:D(1,15)},{t:"Saved to New laptop",a:-10000,at:D(1,11)},{t:"Saved to Rent",a:-20000,at:D(1,9)},{t:"Office Ajo contribution",a:-25000,at:D(7,18)},{t:"Airtime",a:-2000,at:D(8,12)},{t:"Received from Tunde",a:5000,at:D(10,16)}]};
+  db.activity.unshift=function(x){return Array.prototype.unshift.call(this,{at:Date.now(),...x})};
+  const wait=v=>new Promise(r=>setTimeout(()=>r(v),350));
+  return{
+    getBalance:()=>wait(db.balance),
+    getPaid:()=>wait(db.paid),
+    getActivity:()=>wait(db.activity.slice(0,3)),
+    getAllActivity:()=>wait(db.activity.map(x=>({...x}))),
+    getGoals:()=>wait(goals.map(g=>({...g}))),
+    findCircle:c=>{const k=c.trim().toUpperCase(),x=circles[k];return x?wait({code:k,...x}):Promise.reject(new Error("No circle found for that code"))},
+    joinCircle:c=>{if(joined.find(j=>j.code===c.code))return Promise.reject(new Error("You are already in this circle"));joined.push({...c,joinedN:c.joinedN+1});return wait(joined)},
+    getJoined:()=>wait(joined.map(x=>({...x}))),
+    createCircle:c=>{joined.push({code:c.code,name:c.name.replace(/[&<>"']/g,""),amt:c.amt,every:c.every,size:c.size,joinedN:1,by:"You"});return wait(joined.length-1)},
+    addMember:code=>{const c=joined.find(j=>j.code===code);if(!c||c.joinedN>=c.size)return wait(null);c.joinedN++;if(c.joinedN>=c.size){c.order=[...namesOf(c).slice(0,c.size)].sort(()=>Math.random()-.5);c.round=1;c.others=0;c.pending=false;c.done=false}return wait({...c})},
+    payJoined:code=>{const c=joined.find(j=>j.code===code);if(!c)return Promise.reject(new Error("Circle not found"));if(c.paid)return Promise.reject(new Error("Already paid"));if(db.balance<c.amt)return Promise.reject(new Error("Insufficient balance"));db.balance-=c.amt;c.paid=true;db.activity.unshift({t:c.name+" contribution",a:-c.amt});return wait(db.balance)},
+    progressRound:code=>{const c=joined.find(j=>j.code===code);if(!c||!c.round||!c.paid||c.pending||c.done)return wait(null);
+      if(c.others<c.size-1){c.others++;return wait({e:"paid",c:{...c},who:c.order.filter(n=>n!=="You")[c.others-1]})}
+      const who=c.order[c.round-1];
+      if(who==="You"){c.pending=true;return wait({e:"ready",c:{...c}})}
+      c.round++;c.paid=false;c.others=0;if(c.round>c.size)c.done=true;
+      return wait({e:"collected",c:{...c},who})},
+    collect:code=>{const c=joined.find(j=>j.code===code);if(!c||!c.pending)return Promise.reject(new Error("Nothing to collect"));const pot=c.amt*c.size;db.balance+=pot;db.activity.unshift({t:c.name+" payout",a:pot});c.pending=false;c.round++;c.paid=false;c.others=0;if(c.round>c.size)c.done=true;return wait(pot)},
+    getBanks:()=>wait(banks.map(x=>({...x}))),
+    addBank:b=>{if(banks.find(x=>x.bank===b.bank&&x.num===b.num))return Promise.reject(new Error("That account is already linked"));banks.push({...b,id:Date.now()});return wait(banks.length)},
+    removeBank:id=>{const i=banks.findIndex(x=>x.id===id);if(i>=0)banks.splice(i,1);return wait(banks.length)},
+    leaveCircle:code=>{const i=joined.findIndex(j=>j.code===code);if(i>=0)joined.splice(i,1);return wait(joined)},
+    request:(n,a,note)=>{const r={id:reqs.length+1,n,a,note,s:"pending"};reqs.unshift(r);return wait(r.id)},
+    settle:id=>{const r=reqs.find(x=>x.id===id);if(!r||r.s!=="pending")return wait(null);r.s="paid";db.balance+=r.a;db.activity.unshift({t:"Received from "+r.n,a:r.a});return wait({...r})},
+    getRequests:()=>wait(reqs.map(x=>({...x}))),
+    addGoal:(n,g,d)=>{goals.push({n:n.replace(/[&<>"']/g,""),s:0,g,d});return wait(goals.length-1)},
+    save:(i,a)=>{if(db.balance<a)return Promise.reject(new Error("Insufficient balance"));db.balance-=a;goals[i].s+=a;db.activity.unshift({t:"Saved to "+goals[i].n,a:-a});return wait(goals[i].s)},
+    send:(a,to)=>{if(db.balance<a)return Promise.reject(new Error("Insufficient balance"));db.balance-=a;db.activity.unshift({t:"Transfer to "+to,a:-a});return wait(db.balance)},
+    addMoney:a=>{db.balance+=a;db.activity.unshift({t:"Added from card",a});return wait(db.balance)},
+    payCircle:a=>{if(db.balance<a)return Promise.reject(new Error("Insufficient balance"));db.balance-=a;db.paid++;db.activity.unshift({t:"Office Ajo contribution",a:-a});return wait(db.balance)}
+  };
+})();
+
+const $=id=>document.getElementById(id);
+const fmt=n=>"₦"+n.toLocaleString("en-NG",{minimumFractionDigits:2,maximumFractionDigits:2});
+const naira=n=>(n<0?"−":"+")+"₦"+Math.abs(n).toLocaleString("en-NG");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let shown=0;
+function countTo(target){
+  if(reduce){shown=target;$("bal").textContent=fmt(target);return}
+  const from=shown,t0=performance.now(),dur=900;
+  (function f(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);shown=from+(target-from)*e;$("bal").textContent=fmt(shown);if(p<1)requestAnimationFrame(f)})(t0);
+}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),1800)}
+
+/* ---- Guilloche rosette, drifts with the pointer ---- */
+function rosette(cx,cy,n,phase,base,step){
+  let d="";
+  for(let i=0;i<n;i++){
+    const r0=base+i*step;
+    for(let k=0;k<=180;k++){
+      const a=k/180*Math.PI*2,r=r0+6*Math.sin(9*a+phase+i*.38);
+      d+=(k?"L":"M")+(cx+r*Math.cos(a)).toFixed(1)+" "+(cy+r*Math.sin(a)).toFixed(1);
+    }
+    d+="Z";
+  }
+  return d;
+}
+const rose=$("rose");
+function drawRose(ph){
+  rose.innerHTML='<path fill="none" stroke="#7DD3B5" stroke-opacity=".2" stroke-width=".8" d="'+rosette(330,30,12,ph,30,7)+'"/><path fill="none" stroke="#7DD3B5" stroke-opacity=".12" stroke-width=".8" d="'+rosette(30,250,9,-ph,24,8)+'"/>';
+}
+drawRose(0);
+if(!reduce){
+  let raf=0,px=0;
+  $("hero").addEventListener("pointermove",e=>{const r=e.currentTarget.getBoundingClientRect();px=(e.clientX-r.left)/r.width;if(!raf)raf=requestAnimationFrame(()=>{drawRose(px*3);raf=0})});
+}
+
+/* ---- Member ring ---- */
+const C=2*Math.PI*62;
+function drawRing(){
+  const pos=k=>{const a=k/8*Math.PI*2-Math.PI/2;return[80+62*Math.cos(a),80+62*Math.sin(a)]};
+  let s='<circle cx="80" cy="80" r="62" fill="none" stroke="var(--ring-bg)" stroke-width="3"/><circle class="arc" id="arc" cx="80" cy="80" r="62" fill="none" stroke="var(--btn)" stroke-width="3" stroke-dasharray="'+C+'" stroke-dashoffset="'+C+'" transform="rotate(-90 80 80)"/>';
+  for(let k=0;k<8;k++){const[x,y]=pos(k);
+    s+=k<2?`<circle cx="${x}" cy="${y}" r="11" fill="var(--btn)"/>`:k==2?`<circle cx="${x}" cy="${y}" r="15" fill="#F2B705" stroke="var(--ink)" stroke-width="2"/>`:`<circle cx="${x}" cy="${y}" r="11" fill="var(--card)" stroke="${k==3?"var(--ink)":"var(--line)"}" stroke-width="2"/>`}
+  s+='<text class="ctr" x="80" y="80" text-anchor="middle">₦200k</text><text x="80" y="98" text-anchor="middle" font-size="11" fill="var(--mute)">Round 3 of 8</text>';
+  $("ring").innerHTML=s;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$("arc").setAttribute("stroke-dashoffset",C*(1-3/8))));
+}
+
+/* ---- Render ---- */
+function renderActivity(list){$("act").innerHTML=list.map(x=>`<li><span>${x.t}</span><span class="${x.a<0?"out":""}">${naira(x.a)}</span></li>`).join("")}
+function goalCard(g){
+  const p=g.s/g.g,R=26,c=2*Math.PI*R;
+  return`<div class="goal"><svg viewBox="0 0 64 64" role="img" aria-label="${Math.round(p*100)} percent"><circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--ring-bg)" stroke-width="7"/><circle class="arc" cx="32" cy="32" r="${R}" fill="none" stroke="#F2B705" stroke-width="7" stroke-dasharray="${c}" stroke-dashoffset="${c}" data-off="${c*(1-p)}" transform="rotate(-90 32 32)"/><text x="32" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">${Math.round(p*100)}%</text></svg><strong>${g.n}</strong><span class="mute">₦${(g.s/1000)}k of ₦${(g.g/1000)}k</span></div>`;
+}
+async function init(){
+  drawRing();
+  const[b,paid,act,goals]=await Promise.all([provider.getBalance(),provider.getPaid(),provider.getActivity(),provider.getGoals()]);
+  countTo(b);renderActivity(act);$("paidTxt").textContent=paid+" of 8 paid this round";
+  $("goals").innerHTML=goals.map(goalCard).join("");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll("#goals .arc").forEach(a=>a.setAttribute("stroke-dashoffset",a.dataset.off))));
+}
+$("add").onclick=async()=>{countTo(await provider.addMoney(10000));renderActivity(await provider.getActivity());toast("₦10,000 added")};
+$("pay").onclick=async e=>{
+  const btn=e.currentTarget;btn.disabled=true;
+  try{countTo(await provider.payCircle(25000));$("paidTxt").textContent=(await provider.getPaid())+" of 8 paid this round";renderActivity(await provider.getActivity());syncPay();renderCircle();toast("₦25,000 paid to Office Ajo")}
+  catch(err){btn.disabled=false;toast(err.message)}
+};
+document.querySelectorAll("[data-soon]").forEach(b=>b.onclick=()=>toast(b.dataset.soon+" is coming next"));
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-tab]").forEach(x=>x.removeAttribute("aria-current"));b.setAttribute("aria-current","page");
+  showView({Home:"home",Circles:"circles",Goals:"save",Activity:"activity",Chats:"thread"}[b.dataset.tab]||"other",b.dataset.tab);
+});
+/* ---- Circle, chat and send flow (mock data, same provider) ---- */
+const members=[{n:"Tunde",s:"paid"},{n:"Amaka",s:"paid"},{n:"Chika",s:"paid"},{n:"You",s:"due"},{n:"Sade",s:"due"},{n:"Bode",s:"late"},{n:"Kemi",s:"paid"},{n:"Dayo",s:"paid"}];
+const msgs=[{k:"sys",t:"Amaka paid ₦25,000"},{k:"m",f:"Tunde",t:"Paid since morning o. Who is remaining?"},{k:"sys",t:"Sade's contribution is due today",nudge:"Sade"},{k:"m",f:"Sade",t:"I'll pay by 2pm"}];
+const w=v=>new Promise(r=>setTimeout(()=>r(v),200)),_pay=provider.payCircle;
+provider.getMembers=()=>w(members);provider.getMessages=()=>w(msgs);
+provider.post=t=>{msgs.push({k:"me",t});return w(msgs)};
+provider.nudge=n=>{msgs.push({k:"sys",t:"You nudged "+n+" to pay"});return w(msgs)};
+provider.payCircle=async a=>{const b=await _pay(a);members.find(m=>m.n==="You").s="paid";msgs.push({k:"sys",t:"You paid ₦"+a.toLocaleString("en-NG")});return b};
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const stTxt={paid:"Paid",due:"Due today",late:"Overdue"},stCls={paid:"ok",due:"due",late:"late"};
+async function syncPay(){const m=await provider.getMembers(),p=m.find(x=>x.n==="You").s==="paid";["pay","pay2","pay3"].forEach(id=>{const e=$(id);e.disabled=p;e.textContent=p?"Paid for this round":"Pay ₦25,000"})}
+async function renderCircle(){
+  const m=await provider.getMembers(),n=m.filter(x=>x.s==="paid").length;
+  $("cpaid").textContent=n+" of 8 paid this round";$("cbar").style.width=n/8*100+"%";
+  $("mlist").innerHTML=m.map((x,i)=>`<li><span>${i+1}. ${x.n}${i===2?' <span class="mute">collects next</span>':""}</span><span style="display:flex;gap:8px;align-items:center">${x.s==="late"?`<button class="chip" data-nudge="${x.n}">Nudge</button>`:""}<span class="st ${stCls[x.s]}">${stTxt[x.s]}</span></span></li>`).join("");
+  syncPay();
+}
+async function renderThread(){
+  const[m,ms]=await Promise.all([provider.getMembers(),provider.getMessages()]),n=m.filter(x=>x.s==="paid").length;
+  $("tstat").textContent=n+" of 8 paid · Chika collects Friday";$("tbar").style.width=n/8*100+"%";
+  $("msgs").innerHTML=ms.map(x=>x.k==="sys"?`<div class="sys"><span>${esc(x.t)}</span>${x.nudge?`<button class="chip" data-nudge="${x.nudge}">Nudge</button>`:""}</div>`:`<div class="m ${x.k==="me"?"me":""}">${x.f?`<span class="mute">${x.f}</span>`:""}<span>${esc(x.t)}</span></div>`).join("");
+  syncPay();scrollTo(0,document.body.scrollHeight);
+}
+document.addEventListener("click",e=>{const n=e.target.closest("[data-nudge]");if(n)provider.nudge(n.dataset.nudge).then(()=>{toast("Reminder sent to "+n.dataset.nudge);renderCircle();if(!$("thread").hidden)renderThread()})});
+$("comp").onsubmit=e=>{e.preventDefault();const v=$("mi").value.trim();if(!v)return;$("mi").value="";provider.post(v).then(renderThread)};
+$("pay2").onclick=$("pay3").onclick=$("pay").onclick;
+
+let S={};
+const keys=()=>`<div class="pad">${[1,2,3,4,5,6,7,8,9].map(k=>`<button data-k="${k}">${k}</button>`).join("")}<span></span><button data-k="0">0</button><button data-k="del" aria-label="Delete">Del</button></div>`;
+function startSend(){S={step:1,amt:"",pin:"",tries:3,err:""};renderSend()}
+async function renderSend(){
+  const b=$("sbody"),to="Amaka Obi",amt=+S.amt||0,N=x=>"₦"+x.toLocaleString("en-NG");
+  $("stitle").textContent=S.step===1?"Send money":S.step===2?"Confirm transfer":"";
+  if(S.step===1){const bal=await provider.getBalance();
+    b.innerHTML=`<div class="card"><div class="mute">To</div><strong>${to} · 0123 456 789</strong></div><div class="ctr2"><div class="big2" style="font-size:52px">${N(amt)}</div><div class="mute">Available ${fmt(bal)}</div>${amt>bal?'<div class="err">That is more than your balance</div>':""}</div>${keys()}<button class="btn" id="cont" ${amt<=0||amt>bal?"disabled":""}>Continue</button>`}
+  else if(S.step===2){b.innerHTML=`<div class="card ctr2"><div class="mute">You are sending</div><div class="big2">${N(amt)}</div><div class="mute">to ${to} · Fee ₦0</div></div><h2 class="ctr2">Enter your PIN</h2><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<S.pin.length?"f":""}"></i>`).join("")}</div><div class="ctr2 ${S.err?"err":"mute"}">${S.err||(pinSet?"Enter the PIN you created":"Demo PIN is 1234")}</div>${keys()}`}
+  else if(S.step===3){b.innerHTML=`<svg class="chk" viewBox="0 0 120 120" width="120" height="120" style="align-self:center"><circle pathLength="1" cx="60" cy="60" r="52" fill="none" stroke="var(--btn)" stroke-width="6"/><path pathLength="1" d="M36 62l16 16 32-34" fill="none" stroke="var(--btn)" stroke-width="7"/></svg><div class="ctr2"><div class="big2" style="font-size:40px">${N(amt)} sent</div><div class="mute">to ${to}</div></div><div class="card">${[["Date",new Date().toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"})],["Reference",S.ref],["Fee","₦0"],["Status","Completed"]].map(r=>`<div class="row" style="padding:6px 0"><span class="mute">${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div><button class="btn" id="done">Done</button>`}
+  else{b.innerHTML=`<div class="ctr2"><div class="h" style="font-size:24px;font-weight:700">Transfer failed</div><p class="err">${S.err||"Something went wrong"}</p><p class="mute">${N(amt)} was not sent. Your money is safe in your wallet.</p></div><button class="btn" id="retry">Try again</button><button class="b2" id="done">Back to home</button>`}
+}
+async function checkPin(){
+  if(S.pin===userPin){try{await provider.send(+S.amt,"Amaka Obi");S.ref="AJO-"+Math.floor(1e7+Math.random()*9e7);S.step=3}catch(err){S.step=4;S.err=err.message}}
+  else{S.tries--;S.pin="";S.err=S.tries>0?`Wrong PIN. ${S.tries} attempt${S.tries>1?"s":""} left.`:"Too many wrong attempts.";if(S.tries<=0)S.step=4}
+  renderSend();
+}
+$("sbody").onclick=e=>{
+  const k=e.target.closest("[data-k]");
+  if(k){const v=k.dataset.k;
+    if(S.step===1){S.amt=v==="del"?S.amt.slice(0,-1):(S.amt+v).replace(/^0+/,"").slice(0,8);renderSend()}
+    else if(S.step===2){if(v==="del")S.pin=S.pin.slice(0,-1);else if(S.pin.length<4)S.pin+=v;S.err="";renderSend();if(S.pin.length===4)setTimeout(checkPin,250)}
+    return}
+  if(e.target.id==="cont"){S.step=2;renderSend()}
+  if(e.target.id==="done")showView("home");
+  if(e.target.id==="retry")startSend();
+};
+$("sback").onclick=()=>{if(S.step===2){S.step=1;S.pin="";S.err="";renderSend()}else showView("home")};
+
+/* ---- Save to a goal ---- */
+function refreshGoals(){provider.getGoals().then(g=>{$("goals").innerHTML=g.map(goalCard).join("");requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll("#goals .arc").forEach(a=>a.setAttribute("stroke-dashoffset",a.dataset.off))))})}
+let SV={};
+function startSave(){SV={step:0,i:null,amt:""};renderSave()}
+async function renderSave(){
+  const b=$("savebody"),g=await provider.getGoals(),N=x=>"₦"+x.toLocaleString("en-NG");
+  $("saveT").textContent=SV.step===0?"Goals":SV.step===1?"Save to "+g[SV.i].n:SV.step===3?"New goal":"";
+  $("saveBack").hidden=SV.step===0;
+  if(SV.step===0){b.innerHTML=g.map((x,i)=>{const p=Math.round(x.s/x.g*100);return `<button class="card gbtn" data-gi="${i}"><span class="row" style="width:100%"><strong>${x.n}</strong><span class="mute">${p}%</span></span><span class="bar" style="width:100%"><i style="width:${Math.min(100,p)}%"></i></span><span class="mute">${N(x.s)} of ${N(x.g)} · ${x.d?"by "+x.d+" · ":""}tap to save</span></button>`}).join("")+'<button class="b2" id="newgoal">+ New goal</button>'}
+  else if(SV.step===1){const x=g[SV.i],amt=+SV.amt||0,bal=await provider.getBalance();
+    b.innerHTML=`<div class="card"><div class="row"><span class="mute">Saved so far</span><span class="mute">${Math.round(x.s/x.g*100)}%</span></div><strong>${N(x.s)} of ${N(x.g)}</strong></div><div class="ctr2"><div class="big2" style="font-size:52px">${N(amt)}</div><div class="mute">Wallet ${fmt(bal)}</div>${amt>bal?'<div class="err">That is more than your balance</div>':""}</div><div class="row" style="justify-content:center;gap:8px">${[5000,10000,20000].map(q=>`<button class="chip" data-q="${q}">${N(q)}</button>`).join("")}</div>${keys()}<button class="btn" id="dosave" ${amt<=0||amt>bal?"disabled":""}>Save ${amt?N(amt):""}</button>`}
+  else if(SV.step===3){
+    const now=new Date(),mn=now.toISOString().slice(0,7);
+    b.innerHTML=`<label class="fld"><span class="mute">Goal name</span><input id="gn" maxlength="30" placeholder="e.g. Trip to Cape Town" autocomplete="off"></label><label class="fld"><span class="mute">Target amount (₦)</span><input id="gt" inputmode="numeric" placeholder="450000" autocomplete="off"></label><label class="fld"><span class="mute">Target month (optional)</span><input id="gd" type="month" min="${mn}"></label><div class="mute" id="ghint" aria-live="polite"></div><button class="btn" id="gmake" disabled>Create goal</button>`;
+    const gn=$("gn"),gt=$("gt"),gd=$("gd"),btn=$("gmake"),hint=$("ghint");
+    const upd=()=>{const t=parseInt(gt.value.replace(/\D/g,""))||0;btn.disabled=!(gn.value.trim()&&t>=1000);hint.textContent="";
+      if(gd.value&&t){const[y,m]=gd.value.split("-").map(Number),mo=(y-now.getFullYear())*12+(m-1-now.getMonth());hint.textContent=mo>=1?"Save about "+N(Math.ceil(t/mo))+" a month to get there":"Pick a month in the future"}};
+    [gn,gt,gd].forEach(el=>el.oninput=upd);
+    btn.onclick=async()=>{const t=parseInt(gt.value.replace(/\D/g,"")),d=gd.value?new Date(gd.value+"-01").toLocaleString("en-NG",{month:"short",year:"numeric"}):"";SV.i=await provider.addGoal(gn.value.trim(),t,d);SV.step=1;SV.amt="";toast("Goal created");renderSave()};
+  }
+  else{const x=g[SV.i],p=Math.round(x.s/x.g*100),left=Math.max(0,x.g-x.s);
+    b.innerHTML=`<svg class="chk" viewBox="0 0 120 120" width="110" height="110" style="align-self:center"><circle pathLength="1" cx="60" cy="60" r="52" fill="none" stroke="var(--saf)" stroke-width="6"/><path pathLength="1" d="M36 62l16 16 32-34" fill="none" stroke="var(--saf)" stroke-width="7"/></svg><div class="ctr2"><div class="big2" style="font-size:40px">${N(+SV.amt)} saved</div><div class="mute">to ${x.n}</div></div><div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="row"><strong>${p>=100?"Goal reached":x.n+" is "+p+"% there"}</strong><span class="mute">${left?N(left)+" to go":""}</span></div><div class="bar"><i style="width:${Math.min(100,p)}%"></i></div></div><button class="btn" id="saveDone">Done</button>`}
+}
+$("savebody").onclick=async e=>{
+  const gi=e.target.closest("[data-gi]"),k=e.target.closest("[data-k]"),q=e.target.closest("[data-q]");
+  if(e.target.id==="newgoal"){SV.step=3;renderSave();return}
+  if(gi){SV.step=1;SV.i=+gi.dataset.gi;SV.amt="";renderSave();return}
+  if(q){SV.amt=q.dataset.q;renderSave();return}
+  if(k){const v=k.dataset.k;SV.amt=v==="del"?SV.amt.slice(0,-1):(SV.amt+v).replace(/^0+/,"").slice(0,8);renderSave();return}
+  if(e.target.id==="dosave"){try{await provider.save(SV.i,+SV.amt);const g=(await provider.getGoals())[SV.i],pb=(g.s-(+SV.amt))/g.g*100,pa=g.s/g.g*100,m=[100,75,50,25].find(t=>pb<t&&pa>=t);if(m)notify("goals",m===100?"Goal reached: "+g.n:"You're "+m+"% to "+g.n,"Goals",{v:"save"});SV.step=2;renderSave()}catch(err){toast(err.message)}}
+  if(e.target.id==="saveDone")showView("home");
+};
+$("saveBack").onclick=()=>{SV.step=0;SV.amt="";renderSave()};
+
+/* ---- Start a circle ---- */
+let K={};
+const lenTxt=(e,n)=>e==="week"?n+" weeks":e==="2 weeks"?n*2+" weeks":n+" months",amtOf=()=>parseInt(String(K.amt).replace(/\D/g,""))||0;
+function startStart(){K={step:0,name:"",amt:"",every:"week",size:6,code:""};renderStart()}
+function updSum(){
+  const a=amtOf();
+  $("csum").innerHTML=a?`<div class="row"><span class="mute">Pot each round</span><strong>${money(a*K.size)}</strong></div><div class="row"><span class="mute">Length</span><span>${K.size} rounds · ${lenTxt(K.every,K.size)}</span></div>`:'<span class="mute">Enter a contribution to see the pot.</span>';
+  $("cnext").disabled=!(K.name.trim()&&a>=1000);
+}
+function renderStart(){
+  const b=$("startbody");
+  if(K.step===0){
+    b.innerHTML=`<div class="mute">Step 1 of 2 · Details</div><label class="fld"><span class="mute">Circle name</span><input id="cn" maxlength="30" placeholder="e.g. Office Ajo" value="${esc(K.name)}" autocomplete="off"></label><label class="fld"><span class="mute">Contribution each (₦)</span><input id="ca" inputmode="numeric" placeholder="25000" value="${esc(K.amt)}" autocomplete="off"></label><div><div class="mute" style="margin-bottom:8px">How often</div><div class="chips">${[["week","Weekly"],["2 weeks","Every 2 weeks"],["month","Monthly"]].map(f=>`<button class="chip" data-e="${f[0]}" aria-pressed="${K.every===f[0]}">${f[1]}</button>`).join("")}</div></div><div class="row"><span>Members</span><div class="row"><button class="chip" id="cminus" aria-label="Fewer members">−</button><strong>${K.size}</strong><button class="chip" id="cplus" aria-label="More members">+</button></div></div><div class="card" id="csum" style="display:flex;flex-direction:column;gap:8px"></div><button class="btn" id="cnext" disabled>Continue to invites</button>`;
+    $("cn").oninput=e=>{K.name=e.target.value;updSum()};$("ca").oninput=e=>{K.amt=e.target.value;updSum()};updSum();
+  }else{
+    b.innerHTML=`<div class="mute">Step 2 of 2 · Invite</div><div class="card ctr2" style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="mute">Share this code</div><div class="big2" style="letter-spacing:.06em">${K.code}</div><div class="row" style="gap:8px"><button class="b2" id="ccopy">Copy code</button><button class="b2" id="cshare">Share</button></div></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><div class="row"><strong>1 of ${K.size} joined</strong><span class="mute">${esc(K.name.trim())}</span></div><div style="display:flex;flex-wrap:wrap;gap:8px" aria-hidden="true">${Array.from({length:K.size},(_,i)=>`<i style="width:16px;height:16px;border-radius:50%;${i?"border:2px dashed var(--mute)":"background:var(--btn)"}"></i>`).join("")}</div></div><div class="card" style="border-color:var(--saf)"><span class="mute">The payout order is drawn once all ${K.size} members have joined. You can share the code any time from the circle page.</span></div><button class="btn" id="ccreate">Create circle</button>`;
+  }
+}
+$("startbody").onclick=async e=>{
+  const f=e.target.closest("[data-e]"),id=e.target.id;
+  if(f){K.every=f.dataset.e;renderStart()}
+  else if(id==="cminus"){K.size=Math.max(3,K.size-1);renderStart()}
+  else if(id==="cplus"){K.size=Math.min(12,K.size+1);renderStart()}
+  else if(id==="cnext"){K.step=1;K.code="AJO-"+(1000+Math.floor(Math.random()*9000));renderStart()}
+  else if(id==="ccopy"){try{await navigator.clipboard.writeText(K.code);toast("Code copied")}catch(err){toast("Code: "+K.code)}}
+  else if(id==="cshare"){const t="Join my Ajo circle "+K.name.trim()+" with code "+K.code;try{if(navigator.share)await navigator.share({text:t});else{await navigator.clipboard.writeText(t);toast("Invite message copied")}}catch(err){}}
+  else if(id==="ccreate"){W=await provider.createCircle({code:K.code,name:K.name.trim(),amt:amtOf(),every:K.every,size:K.size});simulate(K.code);toast("Circle created");showView("cwait")}
+};
+$("startBack").onclick=()=>{if(K.step===1){K.step=0;renderStart()}else showView("circles")};
+
+/* ---- Onboarding ---- */
+let userPin="1234",pinSet=false,O={};
+const GOALS=[["Rent",600000],["New laptop",450000],["Emergency fund",500000],["School fees",300000],["Travel",800000],["Wedding",1500000],["Business",1000000]];
+const dots=(n,len)=>`<div class="dots" role="img" aria-label="${n} of ${len} digits entered">${Array.from({length:len},(_,i)=>`<i class="${i<n?"f":""}"></i>`).join("")}</div>`;
+const RING=`<svg viewBox="0 0 160 160" width="140" height="140" style="align-self:center" aria-hidden="true"><circle cx="80" cy="80" r="62" fill="none" stroke="var(--ring-bg)" stroke-width="3"/>${[0,1,2,3,4,5,6,7].map(k=>{const a=k/8*Math.PI*2-Math.PI/2,x=80+62*Math.cos(a),y=80+62*Math.sin(a);return k<2?`<circle cx="${x}" cy="${y}" r="11" fill="var(--btn)"/>`:k===2?`<circle class="swell" cx="${x}" cy="${y}" r="14" fill="#F2B705"/>`:`<circle cx="${x}" cy="${y}" r="11" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>`}).join("")}</svg>`;
+const phoneDigits=s=>{let d=String(s).replace(/\D/g,"");if(d.startsWith("234"))d=d.slice(3);if(d.startsWith("0"))d=d.slice(1);return d};
+function startOnboard(){clearInterval(O.t);O={step:0,phone:"",err:"",buf:"",pin1:"",picks:[],name:"",wait:0,t:0,made:0};renderOnboard()}
+function renderOnboard(){
+  const b=$("obbody"),m=t=>`<div class="${O.err?"err":"mute"} ctr2">${O.err||t}</div>`;
+  $("obBack").hidden=O.step===0||O.step===5;$("obSkip").hidden=O.step===5;
+  if(O.step===0){b.innerHTML=`<div style="font-family:var(--num);font-size:48px;line-height:1">Ajo</div><h1 style="font-size:30px;line-height:1.15">Save together,<br>reach sooner.</h1><p class="mute" style="margin:0">Set goals, join a circle and watch it grow with people you trust.</p>${RING}<label class="fld"><span class="mute">Phone number</span><div style="display:flex;gap:8px"><span class="fix">+234</span><input id="obp" inputmode="tel" placeholder="801 234 5678" value="${esc(O.phone)}" autocomplete="tel" style="flex:1;min-width:0"></div>${O.err?`<div class="err" style="text-align:left">${O.err}</div>`:""}</label><button class="btn" id="obsend">Send code</button><p class="mute" style="margin:0;text-align:center">This is a demo, so no real code is sent.</p>`;
+    $("obp").onkeydown=e=>{if(e.key==="Enter")$("obsend").click()}}
+  else if(O.step===1){b.innerHTML=`<h1>Enter the code</h1><p class="mute" style="margin:0">We sent a 6-digit code to +234 ••• ••• ${phoneDigits(O.phone).slice(-4)}</p>${dots(O.buf.length,6)}${m("Demo code is 123456")}${keys()}<button class="b2" id="obresend" ${O.wait>0?"disabled":""}>${O.wait>0?"Resend code in "+O.wait+"s":"Resend code"}</button>`}
+  else if(O.step===2||O.step===3){b.innerHTML=`<h1>${O.step===2?"Create your PIN":"Confirm your PIN"}</h1><p class="mute" style="margin:0">${O.step===2?"You'll use this 4-digit PIN to confirm transfers.":"Enter the same PIN again."}</p>${dots(O.buf.length,4)}${m(" ")}${keys()}`}
+  else if(O.step===4){b.innerHTML=`<h1>What are you saving for?</h1><p class="mute" style="margin:0">Pick as many as you like. You can add more later.</p><label class="fld"><span class="mute">Your first name</span><input id="obn" maxlength="20" placeholder="e.g. Ada" value="${esc(O.name)}" autocomplete="given-name"></label><div class="chips">${GOALS.map(g=>`<button class="chip" data-g="${g[0]}" aria-pressed="${O.picks.includes(g[0])}">${g[0]}</button>`).join("")}</div><button class="btn" id="obfin">Finish setup</button>`;
+    $("obn").oninput=e=>{O.name=e.target.value}}
+  else{const nm=O.name.trim();b.innerHTML=chk("var(--btn)")+`<div class="ctr2"><h1>You're all set${nm?", "+esc(nm):""}</h1><div class="mute">${O.made?`We added ${O.made} new ${O.made===1?"goal":"goals"} to your wallet.`:"Your wallet is ready."}</div></div><button class="btn" id="obgo">Go to my wallet</button>`}
+}
+function obCheck(){
+  const max=O.step===1?6:4;if(O.buf.length!==max)return;
+  if(O.step===1){if(O.buf==="123456"){O.step=2;O.err=""}else O.err="That code is wrong. Try again.";O.buf=""}
+  else if(O.step===2){O.pin1=O.buf;O.buf="";O.step=3}
+  else if(O.step===3){if(O.buf===O.pin1){userPin=O.pin1;pinSet=true;O.step=4;O.err=""}else{O.err="PINs don't match. Start again.";O.step=2;O.pin1=""}O.buf=""}
+  if(O.step!==1)clearInterval(O.t);
+  renderOnboard();
+}
+$("obbody").onclick=async e=>{
+  const k=e.target.closest("[data-k]"),g=e.target.closest("[data-g]"),id=e.target.id;
+  if(k&&O.step>=1&&O.step<=3){const max=O.step===1?6:4,v=k.dataset.k;O.err="";O.buf=v==="del"?O.buf.slice(0,-1):O.buf.length<max?O.buf+v:O.buf;renderOnboard();if(O.buf.length===max)setTimeout(obCheck,250);return}
+  if(g){const v=g.dataset.g;O.picks=O.picks.includes(v)?O.picks.filter(x=>x!==v):[...O.picks,v];renderOnboard();return}
+  if(id==="obsend"){O.phone=$("obp").value;if(phoneDigits(O.phone).length!==10){O.err="Enter a valid Nigerian number, for example 801 234 5678";renderOnboard();return}
+    P.phone=phoneDigits(O.phone);O.err="";O.step=1;O.buf="";O.wait=30;clearInterval(O.t);
+    O.t=setInterval(()=>{if(O.step!==1){clearInterval(O.t);return}O.wait=Math.max(0,O.wait-1);const r=$("obresend");if(r){r.disabled=O.wait>0;r.textContent=O.wait>0?"Resend code in "+O.wait+"s":"Resend code"}},1000);
+    renderOnboard()}
+  if(id==="obresend"){O.wait=30;toast("New code sent (demo: 123456)");renderOnboard()}
+  if(id==="obfin"){
+    const name=O.name.trim().replace(/[&<>"']/g,""),have=(await provider.getGoals()).map(x=>x.n);
+    for(const p of O.picks)if(!have.includes(p)){await provider.addGoal(p,GOALS.find(x=>x[0]===p)[1],"");O.made++}
+    $("greet").textContent=name?"Good morning, "+name:"Good morning";$("avatar").textContent=name?name[0].toUpperCase():"A";
+    P.name=name;O.step=5;renderOnboard()}
+  if(id==="obgo")showView("home");
+};
+$("obBack").onclick=()=>{clearInterval(O.t);O.step--;O.err="";O.buf="";renderOnboard()};
+$("obSkip").onclick=()=>{clearInterval(O.t);showView("home")};
+
+/* ---- Notifications ---- */
+const H1=36e5;
+let NF=[{title:"Pay ₦25,000 by Friday",sub:"Office Ajo",at:Date.now()-2*H1,unread:true,go:{v:"circle"}},{title:"Chika collected ₦200,000",sub:"Office Ajo",at:Date.now()-5*H1,unread:true,go:{v:"circle"}},{title:"You're 40% to New laptop",sub:"Goals",at:Date.now()-26*H1,unread:false,go:{v:"save"}},{title:"6-week saving streak",sub:"Save before Friday to keep it going",at:Date.now()-27*H1,unread:false,go:{v:"save"}},{title:"Transfer to Amaka Obi completed",sub:"Activity",at:Date.now()-28*H1,unread:false,go:{v:"activity"}}];
+function updateBell(){const n=NF.filter(x=>x.unread).length,b=$("bellN");b.textContent=n>9?"9+":n;b.hidden=!n;$("bell").setAttribute("aria-label","Notifications"+(n?", "+n+" unread":""))}
+function notify(kind,title,sub,go){
+  toast(title);if(P.n[kind]===false)return;
+  NF.unshift({title,sub,at:Date.now(),unread:true,go});updateBell();if(!$("notifs").hidden)renderNotifs();
+}
+const ago=at=>{const m=Math.round((Date.now()-at)/6e4);return m<1?"Just now":m<60?m+" min ago":m<1440?Math.round(m/60)+"h ago":dayLbl(at)};
+function renderNotifs(){
+  let last="",h="";
+  NF.forEach((x,i)=>{const d=dayLbl(x.at);if(d!==last){h+=`<div class="mute" style="padding:16px 0 4px">${d}</div>`;last=d}
+    h+=`<button class="li" data-n="${i}" style="width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:12px 0;align-items:flex-start"><span style="display:flex;gap:12px;align-items:flex-start"><i style="flex:0 0 10px;height:10px;margin-top:6px;border-radius:50%;background:${x.unread?"var(--saf)":"transparent"}"></i><span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:${x.unread?700:400}">${esc(x.title)}</span><span class="mute">${esc(x.sub)} · ${ago(x.at)}</span></span></span></button>`});
+  $("nflist").innerHTML=h||'<p class="mute" style="padding:32px 0;text-align:center">You are all caught up.</p>';
+  $("nfall").disabled=!NF.some(x=>x.unread);
+}
+$("nflist").onclick=async e=>{
+  const b=e.target.closest("[data-n]");if(!b)return;
+  const x=NF[+b.dataset.n],g=x.go;x.unread=false;updateBell();
+  if(!g){renderNotifs();return}
+  if(g.v==="cwait"){const j=await provider.getJoined(),i=j.findIndex(c=>c.code===g.code);if(i>=0){W=i;showView("cwait")}else showView("circles");return}
+  showView(g.v);
+};
+$("nfall").onclick=()=>{NF.forEach(x=>x.unread=false);updateBell();renderNotifs()};
+updateBell();
+
+/* ---- Bank accounts and help ---- */
+const BANKS=["Access Bank","GTBank","Zenith Bank","First Bank","UBA","Kuda","Opay","Moniepoint","Wema Bank","Sterling Bank"];
+let BK={};
+function startBank(){BK={step:0,bank:"",num:"",name:"",err:"",busy:false,sure:0};renderBank()}
+async function renderBank(){
+  const b=$("bankbody"),acc=await provider.getBanks();
+  $("bankT").textContent=BK.step===0?"Bank accounts":"Add bank account";
+  if(BK.step===0){b.innerHTML=(acc.length?acc.map(a=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><strong>${a.bank}</strong><div class="mute">${esc(a.name)} · •••• ${a.num.slice(-4)}</div></div><button class="chip" data-rm="${a.id}">${BK.sure===a.id?"Tap again":"Remove"}</button></div>`).join(""):`<div class="card"><strong>No bank account linked</strong><div class="mute">Link an account to move money in and out of Ajo.</div></div>`)+`<button class="btn" id="bkadd">Add bank account</button>`}
+  else if(BK.step===1){b.innerHTML=`<label class="fld"><span class="mute">Bank</span><select id="bkb"><option value="">Choose a bank</option>${BANKS.map(x=>`<option ${BK.bank===x?"selected":""}>${x}</option>`).join("")}</select></label><label class="fld"><span class="mute">Account number</span><input id="bkn" inputmode="numeric" maxlength="10" placeholder="10 digits" value="${esc(BK.num)}" autocomplete="off">${BK.err?`<div class="err" style="text-align:left">${BK.err}</div>`:""}</label><button class="btn" id="bkver" ${BK.busy?"disabled":""}>${BK.busy?"Verifying…":"Verify account"}</button>`;
+    $("bkb").onchange=e=>{BK.bank=e.target.value};$("bkn").oninput=e=>{BK.num=e.target.value.replace(/\D/g,"");e.target.value=BK.num}}
+  else if(BK.step===2){b.innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:6px"><div class="li"><span class="mute">Bank</span><strong>${BK.bank}</strong></div><div class="li"><span class="mute">Account number</span><strong>${BK.num}</strong></div><div class="li" style="border:0"><span class="mute">Account name</span><strong>${esc(BK.name)}</strong></div></div><div class="mute">Is this your account? Demo only: the name is made up.</div><button class="btn" id="bklink">Link this account</button><button class="b2" id="bkedit">Change details</button>`}
+  else{b.innerHTML=chk("var(--btn)")+`<div class="ctr2"><div class="big2" style="font-size:36px">Account linked</div><div class="mute">${BK.bank} · •••• ${BK.num.slice(-4)}</div></div><button class="btn" id="bkdone">Done</button>`}
+}
+$("bankbody").onclick=async e=>{
+  const rm=e.target.closest("[data-rm]"),id=e.target.id;
+  if(rm){const v=+rm.dataset.rm;if(BK.sure===v){await provider.removeBank(v);BK.sure=0;toast("Account removed")}else BK.sure=v;renderBank();return}
+  if(id==="bkadd"){BK.step=1;BK.err="";BK.bank="";BK.num="";renderBank()}
+  if(id==="bkver"){
+    if(!BK.bank)BK.err="Choose your bank.";else if(BK.num.length!==10)BK.err="Account numbers have 10 digits.";else BK.err="";
+    if(BK.err){renderBank();return}
+    BK.busy=true;await renderBank();await new Promise(r=>setTimeout(r,800));BK.busy=false;BK.name=(P.name||"Account holder").toUpperCase();BK.step=2;renderBank()}
+  if(id==="bkedit"){BK.step=1;renderBank()}
+  if(id==="bklink"){try{await provider.addBank({bank:BK.bank,num:BK.num,name:BK.name});BK.step=3;renderBank()}catch(err){BK.err=err.message;BK.step=1;renderBank()}}
+  if(id==="bkdone"){BK.step=0;renderBank()}
+};
+$("bankBack").onclick=()=>{if(BK.step===0)showView("profile");else if(BK.step===2){BK.step=1;renderBank()}else{BK.step=0;BK.err="";renderBank()}};
+
+const FAQ=[["How does a circle work?","Every member pays the same amount each round, and one member collects the whole pot. Everyone collects once, in an order drawn at random when the circle is full."],["Can I leave a circle?","Yes, while it is still waiting for members. Once a circle is full and running, contributions are committed."],["What if someone is late?","Their payment shows as overdue, and you can send a nudge from the circle page."],["How do I change my PIN?","Open your profile, then Security, then Change PIN."],["Is real money being moved?","No. This is a demo built on sample data, so no real payments, banks or codes are involved."]];
+function startHelp(){
+  $("helpbody").innerHTML=`<div>${FAQ.map(f=>`<details class="faq"><summary>${f[0]}</summary><p class="mute" style="margin:0 0 14px">${f[1]}</p></details>`).join("")}</div><div class="card" style="display:flex;flex-direction:column;gap:10px"><h2>Still need help?</h2><label class="fld"><span class="mute">Your message</span><textarea id="hmsg" rows="4" maxlength="500" placeholder="Tell us what is going on"></textarea></label><button class="btn" id="hsend" disabled>Send message</button><div class="mute">Or email <a href="mailto:support@ajo.example">support@ajo.example</a></div></div>`;
+  $("hmsg").oninput=e=>{$("hsend").disabled=!e.target.value.trim()};
+}
+$("helpbody").onclick=e=>{if(e.target.id==="hsend"){$("hmsg").value="";$("hsend").disabled=true;toast("Message sent. We reply within a day (demo)")}};
+$("helpBack").onclick=()=>showView("profile");
+
+/* ---- Profile and settings ---- */
+const newP=()=>({name:"",phone:"",theme:"system",bio:false,editing:false,n:{reminders:true,circles:true,goals:true}});
+let P=newP(),PF={mode:null,buf:"",nw:"",err:""};
+function setGreeting(){const n=P.name;$("greet").textContent=n?"Good morning, "+n:"Good morning";$("avatar").textContent=n?n[0].toUpperCase():"A"}
+function applyTheme(t){const r=document.documentElement;if(t==="system")r.removeAttribute("data-theme");else r.setAttribute("data-theme",t)}
+function startProfile(){PF={mode:null,buf:"",nw:"",err:""};P.editing=false;renderProfile();provider.getBanks().then(b=>{P.nb=b.length;if(!$("profile").hidden&&!PF.mode&&!P.editing)renderProfile()})}
+function renderProfile(){
+  const b=$("profbody"),d=P.phone,ph=d&&d.length===10?"+234 "+d.slice(0,3)+" "+d.slice(3,6)+" "+d.slice(6):"No number added";
+  if(PF.mode){
+    $("profT").textContent="Change PIN";
+    b.innerHTML=`<h2 class="ctr2">${{old:"Enter your current PIN",new:"Choose a new PIN",conf:"Confirm your new PIN"}[PF.mode]}</h2>${dots(PF.buf.length,4)}<div class="${PF.err?"err":"mute"} ctr2">${PF.err||" "}</div>${keys()}`;return}
+  $("profT").textContent="Profile";
+  const sw=(k,label,on)=>`<li><span>${label}</span><button class="sw" role="switch" aria-checked="${on}" aria-label="${label}" data-sw="${k}"><i></i></button></li>`;
+  b.innerHTML=editCardHTML()+`<div class="card" style="display:${P.editing?"none":"flex"};gap:14px;align-items:center"><div class="avatar" style="width:64px;height:64px;font-size:24px;flex:0 0 64px" aria-hidden="true">${esc((P.name||"A")[0].toUpperCase())}</div><div style="flex:1;min-width:0"><h2>${P.name?esc(P.name):"Add your name"}</h2><div class="mute">${ph}</div></div><button class="chip" id="pedit">Edit</button></div>
+<div><h2>Appearance</h2><div class="chips" style="margin-top:10px">${[["light","Light"],["dark","Dark"],["system","System"]].map(t=>`<button class="chip" data-th="${t[0]}" aria-pressed="${P.theme===t[0]}">${t[1]}</button>`).join("")}</div></div>
+<div><h2>Security</h2><ul class="act"><li><span>Change PIN</span><button class="chip" id="ppin">Change</button></li>${sw("bio","Fingerprint or face unlock",P.bio)}</ul></div>
+<div><h2>Notifications</h2><ul class="act">${sw("reminders","Payment reminders",P.n.reminders)}${sw("circles","Circle activity",P.n.circles)}${sw("goals","Goal milestones",P.n.goals)}</ul></div>
+<div><h2>Account</h2><ul class="act"><li><span>Linked bank account</span><button class="chip" id="pbank">${P.nb?"Manage":"Add"}</button></li><li><span>Help and support</span><button class="chip" id="phelp">Open</button></li><li><span>Replay onboarding</span><button class="chip" id="preplay">Replay</button></li></ul></div>
+<button class="b2" id="plogout">Log out</button>`;
+  if(P.editing){const f=$(P.err?"ep":"en");f.focus();$("en").oninput=ev=>{P.draftName=ev.target.value};$("ep").oninput=ev=>{P.draftPhone=ev.target.value};[$("en"),$("ep")].forEach(x=>x.onkeydown=ev=>{if(ev.key==="Enter")$("psave").click()})}
+}
+function editCardHTML(){
+  if(!P.editing)return"";
+  return`<div class="card" style="display:flex;flex-direction:column;gap:12px"><h2>Edit profile</h2><label class="fld"><span class="mute">First name</span><input id="en" maxlength="20" value="${esc(P.draftName)}" autocomplete="given-name" placeholder="e.g. Ada"></label><label class="fld"><span class="mute">Phone number</span><div style="display:flex;gap:8px"><span class="fix">+234</span><input id="ep" inputmode="tel" value="${esc(P.draftPhone)}" placeholder="801 234 5678" autocomplete="tel" style="flex:1;min-width:0"></div>${P.err?`<div class="err" style="text-align:left">${P.err}</div>`:""}</label><div class="row" style="justify-content:flex-end;gap:8px"><button class="chip" id="pcancel">Cancel</button><button class="btn" id="psave">Save</button></div></div>`;
+}
+function pfCheck(){
+  if(!PF.mode||PF.buf.length!==4)return;
+  if(PF.mode==="old"){if(PF.buf===userPin){PF.mode="new";PF.err=""}else PF.err="That PIN is wrong."}
+  else if(PF.mode==="new"){PF.nw=PF.buf;PF.mode="conf"}
+  else{if(PF.buf===PF.nw){userPin=PF.nw;pinSet=true;PF.mode=null;toast("PIN changed")}else{PF.err="PINs don't match. Try again.";PF.mode="new"}}
+  PF.buf="";renderProfile();
+}
+$("profbody").onclick=e=>{
+  const k=e.target.closest("[data-k]"),th=e.target.closest("[data-th]"),sw=e.target.closest("[data-sw]"),s=e.target.closest("[data-soon]"),id=e.target.id;
+  if(k&&PF.mode){const v=k.dataset.k;PF.err="";PF.buf=v==="del"?PF.buf.slice(0,-1):PF.buf.length<4?PF.buf+v:PF.buf;renderProfile();if(PF.buf.length===4)setTimeout(pfCheck,250);return}
+  if(th){P.theme=th.dataset.th;applyTheme(P.theme);renderProfile();return}
+  if(sw){const key=sw.dataset.sw;if(key==="bio"){P.bio=!P.bio;toast(P.bio?"Biometric unlock on (demo)":"Biometric unlock off")}else P.n[key]=!P.n[key];renderProfile();return}
+  if(s){toast(s.dataset.soon+" is coming next");return}
+  if(id==="pedit"){P.editing=true;P.draftName=P.name;P.draftPhone=P.phone;P.err="";renderProfile()}
+  if(id==="pcancel"){P.editing=false;P.err="";renderProfile()}
+  if(id==="psave"){
+    const nm=P.draftName.trim().replace(/[&<>"']/g,""),dg=phoneDigits(P.draftPhone);
+    if(P.draftPhone.trim()&&dg.length!==10){P.err="Enter a valid number, for example 801 234 5678";renderProfile();return}
+    P.name=nm;P.phone=P.draftPhone.trim()?dg:"";P.editing=false;P.err="";setGreeting();toast("Profile saved");renderProfile()}
+  if(id==="ppin"){PF={mode:"old",buf:"",nw:"",err:""};renderProfile()}
+  if(id==="pbank")showView("bank");
+  if(id==="phelp")showView("help");
+  if(id==="preplay")showView("onboard");
+  if(id==="plogout"){P=newP();applyTheme("system");setGreeting();toast("Logged out");showView("onboard")}
+};
+$("profBack").onclick=()=>{if(PF.mode){PF.mode=null;PF.buf="";renderProfile()}else showView("home")};
+
+/* ---- Rounds and payout day ---- */
+function runRound(code){
+  const t=setInterval(async()=>{
+    const r=await provider.progressRound(code);if(!r){clearInterval(t);return}
+    const c=r.c,pot=c.amt*c.size;
+    if(r.e==="paid")toast(r.who+" paid "+c.name);
+    else if(r.e==="ready"){notify("circles","Your payout is ready",money(pot)+" from "+c.name,{v:"cwait",code});clearInterval(t)}
+    else{notify("circles",r.who+" collected "+money(pot),c.name,{v:"cwait",code});clearInterval(t)}
+    if(!$("cwait").hidden&&$("wbody").dataset.code===code)renderWait();
+    if(!$("circles").hidden)renderCircles();if(!$("home").hidden)renderJoined();
+  },2200);
+}
+let PYc=null,PYdone=false;
+async function startPayout(){const j=await provider.getJoined();PYc=j[W];PYdone=false;if(!PYc||!PYc.pending){showView("cwait");return}renderPayout()}
+function countEl(el,to){if(reduce){el.textContent=money(to);return}const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/900);el.textContent=money(Math.round(to*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(f)})(t0)}
+function renderPayout(){
+  const c=PYc,pot=c.amt*c.size,r=c.round,b=$("pybody");$("pyRound").textContent=c.name+" · Round "+r;
+  if(!PYdone){
+    let svg='<circle cx="100" cy="100" r="78" fill="none" stroke="var(--btn)" stroke-width="3"/>';
+    for(let k=0;k<c.size;k++){const a=k/c.size*Math.PI*2-Math.PI/2,x=100+78*Math.cos(a),y=100+78*Math.sin(a);svg+=k===r-1?`<circle class="swell" cx="${x}" cy="${y}" r="17" fill="#F2B705" stroke="var(--ink)" stroke-width="2"/>`:`<circle cx="${x}" cy="${y}" r="${c.size>8?8:11}" fill="var(--btn)"/>`}
+    svg+='<text class="ctr" id="pyamt" x="100" y="108" text-anchor="middle" style="font-size:26px">₦0</text>';
+    b.innerHTML=`<svg viewBox="0 0 200 200" width="240" height="240" style="align-self:center" role="img" aria-label="Your payout of ${money(pot)}">${svg}</svg><div class="ctr2"><h1>It's your turn to collect</h1><div class="mute">All ${c.size} members have paid round ${r}.</div></div><div class="card"><div class="li"><span class="mute">From</span><span>${c.size} members × ${money(c.amt)}</span></div><div class="li" style="border:0"><span class="mute">Goes to</span><span>Main wallet</span></div></div><button class="btn" id="pycollect">Collect ${money(pot)}</button>`;
+    countEl($("pyamt"),pot);
+  }else{
+    b.innerHTML=`<div class="bw">${Array.from({length:14},(_,i)=>`<i style="--a:${i*360/14}deg"></i>`).join("")}${chk("var(--btn)")}</div><div class="ctr2"><div class="big2" id="pyamt2" style="font-size:42px">₦0</div><div class="mute">added to your wallet</div></div><button class="btn" id="pydone">Done</button>`;
+    countEl($("pyamt2"),pot);
+  }
+}
+$("pybody").onclick=async e=>{
+  if(e.target.id==="pycollect"){try{await provider.collect(PYc.code);toast(money(PYc.amt*PYc.size)+" collected");PYdone=true;renderPayout();provider.getBalance().then(countTo);provider.getActivity().then(renderActivity)}catch(err){toast(err.message)}}
+  if(e.target.id==="pydone")showView("cwait");
+};
+$("pyClose").onclick=()=>showView("cwait");
+
+/* ---- Simulated members joining ---- */
+const POOL=["Mum","Tunde","Ife","Seun","Bisi","Dami","Ola","Yemi","Kayode","Tola","Ngozi"];
+function namesOf(c){const p=POOL.filter(x=>x!==c.by);return c.by==="You"?["You",...p]:[c.by,"You",...p]}
+function simulate(code){
+  const t=setInterval(async()=>{
+    const c=await provider.addMember(code);
+    if(!c){clearInterval(t);return}
+    if(c.joinedN>=c.size)notify("circles",c.name+" is full","Payout order drawn",{v:"cwait",code});else toast(namesOf(c)[c.joinedN-1]+" joined "+c.name);
+    if(c.joinedN>=c.size)clearInterval(t);
+    if(!$("circles").hidden)renderCircles();
+    if(!$("cwait").hidden&&$("wbody").dataset.code===code)renderWait();
+    if(!$("home").hidden)renderJoined();
+  },4000);
+}
+
+/* ---- Circles list and waiting-circle detail ---- */
+let W=0;
+async function renderCircles(){
+  const[m,j]=await Promise.all([provider.getMembers(),provider.getJoined()]),n=m.filter(x=>x.s==="paid").length;
+  $("clist").innerHTML=`<button class="card gbtn" data-co="office"><span class="row" style="width:100%"><strong style="font-size:18px">Office Ajo</strong><span class="st ok">Active</span></span><span class="mute">Round 3 of 8 · ₦200,000 pot · ₦25,000 each week</span><span class="bar" style="width:100%"><i style="width:${n/8*100}%"></i></span><span class="mute">${n} of 8 paid · Chika collects in 3 days</span></button>`+j.map((c,i)=>`<button class="card gbtn" data-wi="${i}"><span class="row" style="width:100%"><strong style="font-size:18px">${c.name}</strong>${c.joinedN>=c.size?`<span class="st ok">${c.done?"Completed":"Round "+c.round}</span>`:'<span class="st due">Waiting</span>'}</span><span class="mute">${money(c.amt)} every ${c.every} · ${money(c.amt*c.size)} pot</span><span class="bar" style="width:100%"><i style="width:${c.joinedN/c.size*100}%"></i></span><span class="mute">${c.joinedN} of ${c.size} joined</span></button>`).join("");
+}
+$("clist").onclick=e=>{const o=e.target.closest("[data-co]"),w=e.target.closest("[data-wi]");if(o)showView("circle");if(w){W=+w.dataset.wi;showView("cwait")}};
+$("joined").onclick=e=>{const c=e.target.closest("[data-wi]");if(c){W=+c.dataset.wi;showView("cwait")}};
+$("joined").onkeydown=e=>{if(e.key==="Enter"&&e.target.dataset.wi){W=+e.target.dataset.wi;showView("cwait")}};
+async function renderWait(){
+  const j=await provider.getJoined(),c=j[W];if(!c){showView("circles");return}
+  $("wname").textContent=c.name;$("wst").textContent=c.joinedN+" of "+c.size+" joined";$("wbody").dataset.code=c.code;
+  const names=namesOf(c).slice(0,c.joinedN),r=c.size>8?9:11;
+  let svg='<circle cx="80" cy="80" r="62" fill="none" stroke="var(--ring-bg)" stroke-width="3"/>';
+  for(let k=0;k<c.size;k++){const a=k/c.size*Math.PI*2-Math.PI/2,x=80+62*Math.cos(a),y=80+62*Math.sin(a);svg+=k<c.joinedN?`<circle cx="${x}" cy="${y}" r="${r}" fill="var(--btn)"/>`:`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="var(--mute)" stroke-width="2" stroke-dasharray="3 3"/>`}
+  svg+=`<text class="ctr" x="80" y="88" text-anchor="middle">${c.joinedN}/${c.size}</text>`;
+  if(c.round){
+    const pot=c.amt*c.size,paidN=(c.paid?1:0)+c.others,r=Math.min(c.round,c.size);
+    $("wbody").innerHTML=(c.done?`<div class="card" style="border-color:var(--btn)"><strong>Circle completed</strong><div class="mute">All ${c.size} rounds are done. Everyone has collected once.</div></div>`:c.pending?`<div class="card" style="border-color:var(--saf);display:flex;flex-direction:column;gap:8px"><strong>Your payout is ready</strong><span class="mute">All ${c.size} members paid round ${r}.</span><button class="btn" id="wcollect">Collect ${money(pot)}</button></div>`:`<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="row"><strong>Round ${r} of ${c.size}</strong><span class="mute">${c.order[r-1]==="You"?"Your turn to collect":c.order[r-1]+" collects"}</span></div><div class="bar"><i style="width:${paidN/c.size*100}%"></i></div><span class="mute">${paidN} of ${c.size} paid · pot ${money(pot)} · ${money(c.amt)} every ${c.every}</span></div>`)+`<svg viewBox="0 0 160 160" width="150" height="150" style="align-self:center" role="img" aria-label="All ${c.size} places filled">${svg}</svg><div><h2>Payout order</h2><ul class="act">${c.order.map((n,i)=>`<li><span>${i+1}. ${n}${n==="You"?' <span class="mute">you</span>':""}</span><span class="mute">${i+1<c.round||c.done?"collected":i+1===c.round?"this round":"round "+(i+1)}</span></li>`).join("")}</ul></div>`+(c.done?"":`<button class="btn" id="wpay" ${c.paid?"disabled":""}>${c.paid?"Paid for round "+r+" · waiting for others":"Pay round "+r+" contribution "+money(c.amt)}</button>`);
+    return}
+  if(c.joinedN>=c.size){$("wbody").innerHTML=`<div class="card" style="border-color:var(--btn);display:flex;flex-direction:column;gap:6px"><strong>Circle is full</strong><span class="mute">Round 1 of ${c.size} starts now · ${money(c.amt)} every ${c.every} · pot ${money(c.amt*c.size)}</span></div><svg viewBox="0 0 160 160" width="150" height="150" style="align-self:center" role="img" aria-label="All ${c.size} places filled">${svg}</svg><div><h2>Payout order</h2><ul class="act">${c.order.map((n,i)=>`<li><span>${i+1}. ${n}${n==="You"?' <span class="mute">you</span>':""}</span><span class="mute">${i===0?"collects first":"round "+(i+1)}</span></li>`).join("")}</ul></div><button class="btn" id="wpay" ${c.paid?"disabled":""}>${c.paid?"Paid for round 1":"Pay first contribution "+money(c.amt)}</button>`;return}
+  $("wbody").innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="row"><strong>Waiting for members</strong><span class="mute">${money(c.amt)} every ${c.every}</span></div><div class="bar"><i style="width:${c.joinedN/c.size*100}%"></i></div><span class="mute">Pot each round: ${money(c.amt*c.size)} · organised by ${c.by}</span></div><svg viewBox="0 0 160 160" width="150" height="150" style="align-self:center" role="img" aria-label="${c.joinedN} of ${c.size} places filled">${svg}</svg><div class="card"><div class="row"><div><div class="mute">Invite code</div><h2>${c.code}</h2></div><button class="b2" id="wcopy">Copy</button></div></div><div><h2>Members</h2><ul class="act">${names.map(n=>`<li><span>${n}${n===c.by?' <span class="mute">organiser</span>':n==="You"?' <span class="mute">you</span>':""}</span><span class="st ok">Joined</span></li>`).join("")}<li><span class="mute">${c.size-c.joinedN} ${c.size-c.joinedN===1?"place":"places"} open</span></li></ul></div><div class="card" style="border-color:var(--saf)"><span class="mute">The payout order is drawn when all ${c.size} members have joined. Your first contribution is due when the circle starts.</span></div><button class="b2" id="wleave">${c.by==="You"?"Cancel circle":"Leave circle"}</button>`;
+}
+$("wbody").onclick=async e=>{
+  const code=$("wbody").dataset.code;
+  if(e.target.id==="wpay"){try{await provider.payJoined(code);toast("Contribution paid");runRound(code);renderWait();provider.getBalance().then(countTo);provider.getActivity().then(renderActivity)}catch(err){toast(err.message)}}
+  if(e.target.id==="wcollect")showView("payout");
+  if(e.target.id==="wcopy"){try{await navigator.clipboard.writeText(code);toast("Code copied")}catch(err){toast("Code: "+code)}}
+  if(e.target.id==="wleave"){const b=e.target;if(b.dataset.sure){await provider.leaveCircle(code);toast("You left the circle");showView("circles")}else{b.dataset.sure=1;b.textContent="Tap again to leave"}}
+};
+
+/* ---- Join a circle and request money ---- */
+const money=x=>"₦"+x.toLocaleString("en-NG");
+const chk=c=>`<svg class="chk" viewBox="0 0 120 120" width="110" height="110" style="align-self:center"><circle pathLength="1" cx="60" cy="60" r="52" fill="none" stroke="${c}" stroke-width="6"/><path pathLength="1" d="M36 62l16 16 32-34" fill="none" stroke="${c}" stroke-width="7"/></svg>`;
+async function renderJoined(){const j=await provider.getJoined();$("joined").innerHTML=j.length?"<h2>Your other circles</h2>"+j.map((c,i)=>`<div class="card" data-wi="${i}" role="button" tabindex="0" style="cursor:pointer"><div class="row"><strong>${c.name}</strong>${c.joinedN>=c.size?`<span class="st ok">${c.done?"Completed":"Round "+c.round}</span>`:`<span class="st due">${c.joinedN} of ${c.size} joined</span>`}</div><div class="bar" style="margin:10px 0 6px"><i style="width:${c.joinedN/c.size*100}%"></i></div><span class="mute">${money(c.amt)} every ${c.every}${c.joinedN>=c.size?"":" · starts when full"}</span></div>`).join(""):""}
+
+let J={};
+function startJoin(){J={step:0,err:"",code:"",c:null};renderJoin()}
+function renderJoin(){
+  const b=$("joinbody");$("joinBack").hidden=J.step!==1;
+  $("joinT").textContent=J.step===0?"Join a circle":J.step===1?"Review circle":"";
+  if(J.step===0){b.innerHTML=`<p class="mute" style="margin:0">Enter the invite code you were sent.</p><div class="fld"><input id="jc" aria-label="Invite code" placeholder="AJO-0000" autocomplete="off" autocapitalize="characters" maxlength="8" value="${esc(J.code)}" style="text-transform:uppercase;letter-spacing:.08em">${J.err?`<div class="err" style="text-align:left">${J.err}</div>`:""}</div><button class="btn" id="jfind">Find circle</button><div class="mute">Demo codes: AJO-3580 or AJO-7305</div>`;
+    $("jc").onkeydown=e=>{if(e.key==="Enter")$("jfind").click()}}
+  else if(J.step===1){const c=J.c;b.innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:10px"><h2>${c.name}</h2><div class="mute">Organised by ${c.by}</div><div class="li"><span class="mute">Contribution</span><strong>${money(c.amt)} every ${c.every}</strong></div><div class="li"><span class="mute">Pot each round</span><strong>${money(c.amt*c.size)}</strong></div><div class="li" style="border:0"><span class="mute">Members</span><strong>${c.joinedN} of ${c.size} joined</strong></div></div><div class="card" style="border-color:var(--saf)"><span class="mute">The payout order is drawn once all ${c.size} members have joined. Your first contribution is due when the circle starts.</span></div><button class="btn" id="jjoin">Join ${c.name}</button>`}
+  else{const c=J.c;b.innerHTML=chk("var(--btn)")+`<div class="ctr2"><div class="big2" style="font-size:36px">You're in</div><div class="mute">${c.name} · ${c.joinedN+1} of ${c.size} joined</div></div><button class="btn" id="jdone">Done</button>`}
+}
+$("joinbody").onclick=async e=>{
+  const id=e.target.id;
+  if(id==="jfind"){J.code=$("jc").value;try{J.c=await provider.findCircle(J.code);J.step=1;J.err=""}catch(err){J.err=err.message}renderJoin()}
+  if(id==="jjoin"){try{await provider.joinCircle(J.c);simulate(J.c.code);J.step=2;renderJoin()}catch(err){toast(err.message)}}
+  if(id==="jdone")showView("home");
+};
+$("joinBack").onclick=()=>{J.step=0;J.err="";renderJoin()};
+
+let R={};
+const people=["Amaka Obi","Tunde","Chika","Sade"];
+function startRequest(){R={step:0,to:null,amt:"",note:""};renderRequest()}
+async function renderRequest(){
+  const b=$("reqbody"),amt=+R.amt||0;$("reqBack").hidden=R.step===0;$("reqT").textContent=R.step===0?"Request money":"";
+  if(R.step===0){const rs=await provider.getRequests();
+    b.innerHTML=`<div><div class="mute" style="margin-bottom:8px">Request from</div><div class="chips">${people.map(p=>`<button class="chip" data-p="${p}" aria-pressed="${R.to===p}">${p}</button>`).join("")}</div></div><div class="ctr2"><div class="big2" style="font-size:48px">${money(amt)}</div></div><div class="chips" style="justify-content:center">${[5000,10000,20000].map(q=>`<button class="chip" data-q="${q}">${money(q)}</button>`).join("")}</div><div class="fld"><input id="rn" aria-label="Note" placeholder="Add a note (optional)" maxlength="60" value="${esc(R.note)}" autocomplete="off"></div>${keys()}<button class="btn" id="rsend" ${R.to&&amt>0?"":"disabled"}>${R.to?`Request ${amt?money(amt):""} from ${R.to}`:"Choose who to request from"}</button>${rs.length?`<h2 style="margin-top:8px">Requests</h2><ul class="act">${rs.map(r=>`<li><span>${r.n}${r.note?`<span class="mute"> · ${esc(r.note)}</span>`:""}</span><span style="display:flex;gap:8px;align-items:center">${money(r.a)} <span class="st ${r.s==="paid"?"ok":"due"}">${r.s==="paid"?"Paid":"Pending"}</span></span></li>`).join("")}</ul>`:""}`;
+    $("rn").oninput=e=>{R.note=e.target.value}}
+  else{b.innerHTML=chk("var(--btn)")+`<div class="ctr2"><div class="big2" style="font-size:36px">Request sent</div><div class="mute">${money(amt)} from ${R.to}</div><div class="mute" style="margin-top:6px">We'll let you know when they pay.</div></div><button class="btn" id="rdone">Done</button><button class="b2" id="ragain">Request again</button>`}
+}
+async function afterSettle(id){const r=await provider.settle(id);if(!r)return;notify("payments",r.n+" paid your "+money(r.a)+" request","Request",{v:"activity"});provider.getBalance().then(countTo);provider.getActivity().then(renderActivity);if(!$("request").hidden&&R.step===0)renderRequest()}
+$("reqbody").onclick=async e=>{
+  const p=e.target.closest("[data-p]"),q=e.target.closest("[data-q]"),k=e.target.closest("[data-k]"),id=e.target.id;
+  if(p){R.to=p.dataset.p;renderRequest()}
+  else if(q){R.amt=q.dataset.q;renderRequest()}
+  else if(k){const v=k.dataset.k;R.amt=v==="del"?R.amt.slice(0,-1):(R.amt+v).replace(/^0+/,"").slice(0,8);renderRequest()}
+  else if(id==="rsend"){const rid=await provider.request(R.to,+R.amt,R.note.trim());R.step=1;renderRequest();setTimeout(()=>afterSettle(rid),6000)}
+  else if(id==="rdone")showView("home");
+  else if(id==="ragain")startRequest();
+};
+$("reqBack").onclick=startRequest;
+
+/* ---- Activity: search, filter, grouped by day ---- */
+let A={q:"",f:"all"};
+const fl={all:"All",in:"Money in",out:"Money out",goals:"Goals",circles:"Circles"};
+const pass={all:()=>true,in:x=>x.a>0,out:x=>x.a<0,goals:x=>/^Saved to/.test(x.t),circles:x=>/Ajo|contribution$/.test(x.t)};
+const dayLbl=at=>{const d=new Date(at),n=new Date(),y=new Date(n),s=z=>z.toDateString();y.setDate(n.getDate()-1);return s(d)===s(n)?"Today":s(d)===s(y)?"Yesterday":d.toLocaleDateString("en-NG",{weekday:"short",day:"numeric",month:"short"})};
+async function renderActivityTab(){
+  const all=await provider.getAllActivity(),q=A.q.trim().toLowerCase(),L=all.filter(x=>pass[A.f](x)&&x.t.toLowerCase().includes(q));
+  $("achips").innerHTML=Object.keys(fl).map(k=>`<button class="chip" data-f="${k}" aria-pressed="${A.f===k}">${fl[k]}</button>`).join("");
+  const sum=(f)=>L.filter(f).reduce((s,x)=>s+Math.abs(x.a),0).toLocaleString("en-NG");
+  $("asum").innerHTML=`<span>In ₦${sum(x=>x.a>0)}</span><span>Out ₦${sum(x=>x.a<0)}</span>`;
+  let last="",h="";
+  L.forEach(x=>{const d=dayLbl(x.at);if(d!==last){h+=`<div class="mute" style="padding:16px 0 4px">${d}</div>`;last=d}
+    h+=`<div class="li"><div><div>${esc(x.t)}</div><div class="mute">${new Date(x.at).toLocaleTimeString("en-NG",{hour:"numeric",minute:"2-digit"})}</div></div><span class="${x.a<0?"out":""}">${naira(x.a)}</span></div>`});
+  $("alist").innerHTML=h||'<p class="mute" style="padding:32px 0;text-align:center">No transactions match.</p>';
+}
+function startActivity(){A={q:"",f:"all"};$("aq").value="";renderActivityTab()}
+$("aq").oninput=e=>{A.q=e.target.value;renderActivityTab()};
+$("achips").onclick=e=>{const b=e.target.closest("[data-f]");if(b){A.f=b.dataset.f;renderActivityTab()}};
+
+const tabOf={home:"Home",circle:"Circles",circles:"Circles",cwait:"Circles",payout:"Circles",thread:"Chats",save:"Goals",activity:"Activity"};
+function showView(v,label){
+  ["home","circle","circles","cwait","payout","onboard","profile","bank","help","notifs","start","thread","send","save","activity","join","request","other"].forEach(id=>$(id).hidden=id!==v);
+  if(v==="other")$("otherT").textContent=label;
+  document.body.classList.toggle("flow",v==="send"||v==="onboard");
+  document.querySelectorAll("[data-tab]").forEach(x=>{(tabOf[v]||label)===x.dataset.tab?x.setAttribute("aria-current","page"):x.removeAttribute("aria-current")});
+  if(v==="circle")renderCircle();if(v==="thread")renderThread();if(v==="send")startSend();if(v==="save")startSave();if(v==="activity")startActivity();if(v==="join")startJoin();if(v==="circles")renderCircles();if(v==="start")startStart();if(v==="payout")startPayout();if(v==="onboard")startOnboard();if(v==="profile")startProfile();if(v==="notifs")renderNotifs();if(v==="bank")startBank();if(v==="help")startHelp();if(v==="cwait")renderWait();if(v==="request")startRequest();
+  if(v==="home"){syncPay();provider.getBalance().then(countTo);provider.getActivity().then(renderActivity);provider.getPaid().then(n=>$("paidTxt").textContent=n+" of 8 paid this round");refreshGoals();renderJoined()}
+  if(v!=="thread")scrollTo(0,0);
+}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>showView(b.dataset.go));
+init();
+showView("onboard");
+</script>
+</body>
+</html>
