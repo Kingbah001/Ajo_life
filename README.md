@@ -1,6 +1,6 @@
 # Ajo (React + Tailwind)
 
-Savings wallet with ajo/esusu-style circles. Vite, React 18, Tailwind CSS v4, no router or state library.
+Savings wallet with ajo/esusu-style circles. Vite 7, React 18, Tailwind CSS v4, no router or state library. Needs Node 20.19 or newer.
 
     npm install
     npm run dev       # local dev server
@@ -25,3 +25,16 @@ The app opens on Onboarding. The single-file version it was ported from is kept 
 - Everything is mock data held in memory, so a reload resets the app.
 - Onboarding code: 123456. Default PIN until you create one: 1234.
 - Join codes: AJO-3580 and AJO-7305.
+
+## Troubleshooting
+If `npm run dev` fails with "Cannot find native binding" (rolldown, rollup, esbuild, lightningcss or @tailwindcss/oxide), npm installed packages for the wrong platform or reused another project's lockfile. Fix it from the project folder:
+
+    # PowerShell
+    Remove-Item -Recurse -Force node_modules
+    Remove-Item package-lock.json
+    npm install
+    npm run dev
+
+This project uses Vite 7, which does not use rolldown. If you see rolldown in the error, the folder contains `node_modules` or a lockfile from a different Vite project (for example one made with `npm create vite@latest`). Unzip into a fresh, empty folder to avoid that.
+
+Do not run `npm audit fix --force`. It upgrades Vite to a new major version that this project's plugins do not support yet, and the install then fails with an ERESOLVE error. The dependencies are pinned to versions that install cleanly and report 0 vulnerabilities.
